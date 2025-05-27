@@ -4,7 +4,7 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 
 const PORT = process.env.PORT || 3000;
-const STATUS_URL = "https://littlesigplanet.com/status";
+const STATUS_URL = "https://status-lbp-com.onrender.com";
 let lastSnapshot = "";
 
 async function fetchStatus() {
