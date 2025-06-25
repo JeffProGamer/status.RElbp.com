@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LBP Game Server Status</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #000, #1a1a1a);
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding-top: 60px;
+      overflow: hidden;
+    }
+    .blurred { filter: blur(5px); }
+    #statusCircle {
+      width: 140px; height: 140px; margin: 0 auto;
+      border-radius: 50%;
+      background: gray;
+      box-shadow: 0 0 30px #000;
+      transition: background 0.4s ease, box-shadow 0.4s ease;
+      animation: pulse 2s infinite;
+    }
+    #statusText { font-size: 30px; margin-top: 20px; animation: fadein 2s ease; }
+    #log { margin-top: 40px; font-size: 16px; opacity: 0.7; white-space: pre-line; }
+    @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.05);} 100% {transform: scale(1);} }
+    @keyframes fadein { from {opacity: 0;} to {opacity: 1;} }
+  </style>
+</head>
+<body>
+  <h1>🎮 LBP Union Gamer Server Status</h1>
+  <div id="statusCircle"></div>
+  <div id="statusText">Awaiting status...</div>
+  <div id="log"></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const circle = document.getElementById("statusCircle");
+    const text = document.getElementById("statusText");
+    const log = document.getElementById("log");
+    const socket = io();
+
+    socket.on("status", data => {
+      const value = data.value;
+      const lastDown = data.lastDown;
+      const lastUp = data.lastUp;
+
+      if (value === 0) {
+        circle.style.background = "red";
+        circle.style.boxShadow = "0 0 30px red";
+        text.innerText = "🔴 OFFLINE — Fixing / Shutdown / Broken";
+        document.body.classList.add("blurred");
+        log.innerText = `Last Up: ${lastUp}
+Went Down: ${lastDown}`;
+      } else if (value === 50) {
+        circle.style.background = "yellow";
+        circle.style.boxShadow = "0 0 30px yellow";
+        text.innerText = "🟡 WARNING — Unstable / About to Break!";
+        document.body.classList.remove("blurred");
+        log.innerText = `Last Down: ${lastDown}`;
+      } else if (value === 100) {
+        circle.style.background = "lime";
+        circle.style.boxShadow = "0 0 30px lime";
+        text.innerText = "🟢 ONLINE — Server Online";
+        document.body.classList.remove("blurred");
+        log.innerText = `Last Down: ${lastDown}`;
+      } else {
+        circle.style.background = "gray";
+        text.innerText = "Unknown status.";
+        document.body.classList.add("blurred");
+      }
+    });
+  </script>
+</body>
+</html>
