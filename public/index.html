@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>LBP Server Timeline</title>
+  <title>LBP Real Server Timeline</title>
   <style>
     body { background: #0d0d0d; color: #eee; font-family: sans-serif; text-align: center; padding: 40px; }
     h2 { margin-bottom: 20px; }
@@ -14,7 +14,7 @@
   </style>
 </head>
 <body>
-  <h2>SCEE Sony Official Servers</h2>
+  <h2>SCEE Sony Official Servers Real Status</h2>
   <div class="status-card">
     <div class="badge" id="percent">0%</div>
     <div class="timeline" id="timeline"></div>
@@ -27,17 +27,15 @@
     const socket = io();
 
     socket.on("timeline", data => {
+      const timeline = data.timeline;
       timelineEl.innerHTML = "";
-      let upCount = 0;
-      data.forEach(point => {
+      timeline.forEach(point => {
         const block = document.createElement("div");
         block.className = "block " + (point.value === 100 ? "green" : "red");
         timelineEl.appendChild(block);
-        if (point.value === 100) upCount++;
       });
-      const percent = data.length ? (upCount / data.length * 100).toFixed(2) : "0.00";
-      percentEl.textContent = `${percent}%`;
-      percentEl.style.background = percent > 90 ? "#2ecc71" : (percent > 50 ? "#f1c40f" : "#e74c3c");
+      percentEl.textContent = `${data.percent}%`;
+      percentEl.style.background = data.percent > 90 ? "#2ecc71" : (data.percent > 50 ? "#f1c40f" : "#e74c3c");
     });
   </script>
 </body>
