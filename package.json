@@ -1,13 +1,7 @@
 {
-  "name": "lbp-server-status",
+  "name": "lbp-timeline-status",
   "version": "1.0.0",
-  "description": "Full LBP Gamer Server Status Site",
   "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2",
-    "socket.io": "^4.7.2"
-  }
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.18.2", "socket.io": "^4.7.2", "node-fetch": "^2.6.7" }
 }

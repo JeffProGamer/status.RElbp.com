@@ -1,72 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>LBP Game Server Status</title>
+  <title>LBP Server Timeline</title>
   <style>
-    body {
-      background: linear-gradient(135deg, #000, #1a1a1a);
-      color: white;
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      padding-top: 60px;
-      overflow: hidden;
-    }
-    .blurred { filter: blur(5px); }
-    #statusCircle {
-      width: 140px; height: 140px; margin: 0 auto;
-      border-radius: 50%;
-      background: gray;
-      box-shadow: 0 0 30px #000;
-      transition: background 0.4s ease, box-shadow 0.4s ease;
-      animation: pulse 2s infinite;
-    }
-    #statusText { font-size: 30px; margin-top: 20px; animation: fadein 2s ease; }
-    #log { margin-top: 40px; font-size: 16px; opacity: 0.7; white-space: pre-line; }
-    @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.05);} 100% {transform: scale(1);} }
-    @keyframes fadein { from {opacity: 0;} to {opacity: 1;} }
+    body { background: #0d0d0d; color: #eee; font-family: sans-serif; text-align: center; padding: 40px; }
+    h2 { margin-bottom: 20px; }
+    .status-card { background: #121212; border-radius: 10px; padding: 20px; display: inline-block; text-align: left; min-width: 600px; }
+    .badge { display: inline-block; background: #2ecc71; color: black; padding: 5px 10px; border-radius: 20px; font-weight: bold; }
+    .timeline { display: flex; gap: 2px; margin-top: 15px; height: 20px; }
+    .block { flex: 1; border-radius: 2px; transition: background 0.3s; }
+    .green { background: #2ecc71; }
+    .red { background: #e74c3c; }
   </style>
 </head>
 <body>
-  <h1>🎮 LBP Union Gamer Server Status</h1>
-  <div id="statusCircle"></div>
-  <div id="statusText">Awaiting status...</div>
-  <div id="log"></div>
+  <h2>SCEE Sony Official Servers</h2>
+  <div class="status-card">
+    <div class="badge" id="percent">0%</div>
+    <div class="timeline" id="timeline"></div>
+  </div>
+
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    const circle = document.getElementById("statusCircle");
-    const text = document.getElementById("statusText");
-    const log = document.getElementById("log");
+    const timelineEl = document.getElementById("timeline");
+    const percentEl = document.getElementById("percent");
     const socket = io();
 
-    socket.on("status", data => {
-      const value = data.value;
-      const lastDown = data.lastDown;
-      const lastUp = data.lastUp;
-
-      if (value === 0) {
-        circle.style.background = "red";
-        circle.style.boxShadow = "0 0 30px red";
-        text.innerText = "🔴 OFFLINE — Fixing / Shutdown / Broken";
-        document.body.classList.add("blurred");
-        log.innerText = `Last Up: ${lastUp}
-Went Down: ${lastDown}`;
-      } else if (value === 50) {
-        circle.style.background = "yellow";
-        circle.style.boxShadow = "0 0 30px yellow";
-        text.innerText = "🟡 WARNING — Unstable / About to Break!";
-        document.body.classList.remove("blurred");
-        log.innerText = `Last Down: ${lastDown}`;
-      } else if (value === 100) {
-        circle.style.background = "lime";
-        circle.style.boxShadow = "0 0 30px lime";
-        text.innerText = "🟢 ONLINE — Server Online";
-        document.body.classList.remove("blurred");
-        log.innerText = `Last Down: ${lastDown}`;
-      } else {
-        circle.style.background = "gray";
-        text.innerText = "Unknown status.";
-        document.body.classList.add("blurred");
-      }
+    socket.on("timeline", data => {
+      timelineEl.innerHTML = "";
+      let upCount = 0;
+      data.forEach(point => {
+        const block = document.createElement("div");
+        block.className = "block " + (point.value === 100 ? "green" : "red");
+        timelineEl.appendChild(block);
+        if (point.value === 100) upCount++;
+      });
+      const percent = data.length ? (upCount / data.length * 100).toFixed(2) : "0.00";
+      percentEl.textContent = `${percent}%`;
+      percentEl.style.background = percent > 90 ? "#2ecc71" : (percent > 50 ? "#f1c40f" : "#e74c3c");
     });
   </script>
 </body>
